@@ -6,6 +6,8 @@ const piecesimages = document.getElementsByClassName("img");
 
 setupBoardSquares();
 setupPieces();
+
+
 function setupBoardSquares(){
     for(let i=0;i<boardSquares.length;i++){
         boardSquares[i].addEventListener("dragover",allowDrop);
@@ -19,6 +21,7 @@ function setupBoardSquares(){
     }
 }
 
+
 function setupPieces(){
     for(let i=0;i<pieces.length;i++){
         pieces[i].addEventListener("dragstart",drag);
@@ -26,8 +29,8 @@ function setupPieces(){
         pieces[i].id=pieces[i].className.split(" ")[1]+pieces[i].parentElement.id;
     }
 
-    for(let i=0;i<piecesImages.length;i++){
-        piecesImages[i].setAttribute("draggable",false);
+    for(let i=0;i<piecesimages.length;i++){
+        piecesimages[i].setAttribute("draggable",false);
     }
 }
 
@@ -39,7 +42,10 @@ function drag(ev){
     const piece=ev.target;
     const pieceColor=piece.getAttribute("color");
     if((isWhiteTurn && pieceColor == "white")||(!isWhiteTurn && pieceColor == "black")){
+
         ev.dataTransfer.setData("text" ,piece.id);
+        const startingSqueareId = piece.parentNode.id;
+        getPossibleMoves(startingSqueareId,piece);
     }
      
 }
@@ -50,12 +56,18 @@ function drop(ev){
     const piece = document.getElementById(data);
     const destinationSquare = ev.currentTarget;
     let destinationSquareId = destinationSquare.id;
-    if(isSquareOccupied(destinationSquare)=="black"){
+    if((isSquareOccupied(destinationSquare)=="black")&&(legalSquares.includes(destinationSquareId))){
         destinationSquare.appendChild(piece);
         isWhiteTurn=!isWhiteTurn;
+        return;
     }
     if(isSquareOccupied(destinationSquare) !="black"){
-        while(destinationSquare.firstChild);
+        while(destinationSquare.firstChild){
+            destinationSquare.removeChild(destinationSquare.firstChild); 
+        }
+        destinationSquare.appendChild(piece);
+        isWhiteTurn=!isWhiteTurn;
+        return;
     }
     
 }
